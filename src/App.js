@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import supabase from "./superbase";
 import "./style.css";
 
 const CATEGORIES = [
@@ -49,6 +50,24 @@ const initialFacts = [
 function App() {
   const [showForm, setShowForm] = useState(false);
   const [facts, setFacts] = useState(initialFacts);
+  const [loader, setLoader] = useState(true);
+  const [currentCategory, setCurrentCategory] = useState("all");
+
+  useEffect(() => {
+    async function getFact() {
+      let query = supabase.from("fact").select("*");
+
+      if (currentCategory !== "all")
+        query = query.eq("category", currentCategory);
+
+      let { data: fact, error } = await query
+        .order("id", { ascending: false })
+        .limit(100);
+      setFacts(fact);
+      setLoader(false);
+    }
+    getFact();
+  }, [currentCategory]);
 
   return (
     <>
@@ -58,11 +77,15 @@ function App() {
       ) : null}
 
       <main className="main">
-        <CategoryFilter />
-        <FactList facts={facts} />
+        <CategoryFilter setCurrentCategory={setCurrentCategory} />
+        {loader ? <Loader /> : <FactList facts={facts} />}
       </main>
     </>
   );
+}
+
+function Loader() {
+  return <div className="message">Loading...</div>;
 }
 
 function Header({ setShowForm, showForm }) {
@@ -100,19 +123,15 @@ function NewFactForm({ setFacts, setShowForm }) {
   const [source, setSource] = useState("");
   const [category, setCategory] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (text && isValidURL(source) && category && text.length <= 200) {
       const newFact = {
-        id: Math.round(Math.round * 10000000),
         text,
         source,
         category,
-        votesInteresting: 0,
-        votesMindblowing: 0,
-        votesFalse: 0,
-        createdIn: new Date().getFullYear(),
       };
+      await supabase.from("fact").insert([newFact]).select();
 
       setFacts((currentData) => [newFact, ...currentData]);
 
@@ -134,7 +153,7 @@ function NewFactForm({ setFacts, setShowForm }) {
       <span>{200 - text.length}</span>
       <input
         type="text"
-        placeholder="Trustworthy Source..."
+        placeholder="URL Link Resource...."
         value={source}
         onChange={(e) => setSource(e.target.value)}
       />
@@ -151,18 +170,24 @@ function NewFactForm({ setFacts, setShowForm }) {
   );
 }
 
-function CategoryFilter() {
+function CategoryFilter({ setCurrentCategory }) {
   return (
     <aside>
       <ul>
         <li className="category">
-          <button className="btn btn-all-category">All</button>
+          <button
+            className="btn btn-all-category"
+            onClick={() => setCurrentCategory("all")}
+          >
+            All
+          </button>
         </li>
         {CATEGORIES.map((cat) => (
           <li className="category" key={cat.name}>
             <button
               className="btn btn-category"
               style={{ backgroundColor: cat.color }}
+              onClick={() => setCurrentCategory(cat.name)}
             >
               {cat.name}
             </button>
@@ -174,6 +199,13 @@ function CategoryFilter() {
 }
 
 function FactList({ facts }) {
+  if (facts.length === 0) {
+    return (
+      <span className="message">
+        No Fact For This Category Yet! Create First One
+      </span>
+    );
+  }
   return (
     <section>
       <ul className="fact-list">
@@ -181,6 +213,7 @@ function FactList({ facts }) {
           <Fact fact={data} key={data.id} />
         ))}
       </ul>
+      <p>There are {facts.length} facts.</p>
     </section>
   );
 }

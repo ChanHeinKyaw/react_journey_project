@@ -21,7 +21,7 @@
           <img src="./logo.png" alt="My Website Logo" />
           <h1>React Project</h1>
         </div>
-        <button class="btn btn-large">Share A Fact</button>
+        <button class="btn btn-large btn-open">Close</button>
       </header>
       <form action="" class="fact-form">
         <input type="text" placeholder="Share A Fact With The Words...." />
@@ -60,50 +60,10 @@
           </ul>
         </aside>
         <section>
-          <ul>
-            <li class="fact">
-              <p>
-                React is being developed by Meta (formerly facebook)
-                <a
-                  class="source"
-                  href="https://opensource.fb.com/"
-                  target="_blank"
-                  >(Sources)</a
-                >
-              </p>
-              <span class="tag" style="background-color: #3b82f6">
-                #technology#</span
-              >
-              <div class="voet-buttons">
-                <button>👍 24</button>
-                <button>🤯 9</button>
-                <button>⛔️ 4</button>
-              </div>
-            </li>
-            <li class="fact">
-              <p>
-                Millennial dads spend 3 times as much time with their kids than
-                their fathers spent with them. In 1982, 43% of fathers had never
-                changed a diaper. Today, that number is down to 3%
-                <a
-                  class="source"
-                  href="https://www.mother.ly/parenting/millennial-dads-spend-more-time-with-their-kids"
-                  target="_blank"
-                  >(Source)</a
-                >
-              </p>
-              <span class="tag" style="background-color: #16a34a">
-                #society#</span
-              >
-              <div class="voet-buttons">
-                <button>👍 24</button>
-                <button>🤯 9</button>
-                <button>⛔️ 4</button>
-              </div>
-            </li>
-          </ul>
+          <ul class="fact-list"></ul>
         </section>
       </main>
     </div>
+    <script src="./script.js"></script>
   </body>
 </html>
